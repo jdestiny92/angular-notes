@@ -1,2 +1,46 @@
 IIFE = Immediately-Invoked Function Expression
 	- it execultes immediately after its created
+	- ensures that local variables do not bleed into global scope
+
+<script>
+	(function(){
+
+	'use strict';	
+
+	})();
+</script>
+
+use strict = stops random variables from populating the global scope, makes var keyword mandatory
+
+Usual setup steps:
+1. in app.js: 
+	<script>
+		angular.module('myFirstApp', [])
+
+		.controller('myFirstCtrl', function($scope){
+			$scope.name = "julian";
+
+			$scope.alert = function(){
+				return 'Hello World';
+			}
+		})
+	</script>
+
+2. Put ng-app onto first 'html' tag or 'body' tag
+
+
+* You can put controllers on any tag for specific logic
+
+3. Reference and use $scope within controller funciton
+
+Use ng-model to reference variable within $scope
+Can also be shown in view via {{}}
+
+* you can use ng-keyup to call a function on every keypress!
+
+
+
+
+
+
+
