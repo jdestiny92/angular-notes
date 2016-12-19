@@ -1,0 +1,19 @@
+Model-View-ViewModel
+
+1. Model - represents and holds raw data (something from database or REST api calls, data/business logic)
+	- some of this data may be displayed in the view
+	- can also contain logic to retrieve the data from the source (http or ajax call)
+	- contains no logic associated with displaying the model
+
+2. View - user interface
+	- web app: just html and css
+	- declaritively broadcasts events, but never handles them (shouldn't write javascript code here)
+
+3. ViewModel - representation of the state of the view (presenatation logic)
+	- holds the data that is displayed in the view
+	- responds to view events, aka presentation logic
+	- calls other functionality for business logic processing
+	- never asks the view to display anything (never directly manipulates the dom)
+
+4. Declarative Binder - declaritively binds the model of the ViewModel to the View
+	- the framework does its magic
