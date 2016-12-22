@@ -40,6 +40,71 @@ Can also be shown in view via {{}}
 
 
 
+Dependency Injection
+---------------------
+
+
+$scope - Angular Js instantiates this object for us
+
+We get access to it via a controller through dependency injection
+
+
+Dependency Injection = design pattern that implements 'inversion of control' for resolving dependencies
+
+
+Besides $scope, you can inject $filter, for example:
+
+<script>
+function DIcontroller ($scope, filter){
+
+	var upCase = $filter('uppercase');
+	$scope.name = upCase($scope.name);
+}
+
+</script>
+
+
+The service 'Injector' or '$injector' is what parses and sorts through the parameters which are injected into controllers
+
+
+Expressions
+-------------
+
+Expression : {{ exp }}
+
+- Something that evaluates some value
+- Executed in the context of the scope and has access to properties on $scope
+- Doesn't throw errors if it results in a TypeError or ReferenceError
+- Control flow functions (like 'if' statements) are not allowed insides handlebars
+- Accepts a filter or a filter chain to format the output
+
+
+Interpolation
+--------------
+
+- Process of evaluating a string literal containing one or more placeholders, which are replaced with values
+- Still conected to the original 'message'  property
+- If the $scope.message changes, so will the interpolation result
+
+
+
+Can call functions from within expressions, example {{saySomething()}}
+
+
+Expressions get interprolated as string literals and then concatinated, so:
+
+You can have cool functionality like this:
+
+<img src="images/yaakov_{{stateofBeing}}.png" >
+
+Which wil switch dynamically with more functionality in reference to yaakov_fed.png and yaakov_hungry.png
+
+
+Use ng-src instead of generic 'src' to let interpolation happen first.....
+
+
+
+
 
 
 
