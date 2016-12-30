@@ -1,0 +1,75 @@
+Filters
+--------
+
+Uppercase:
+	<script>
+		var output = $filter('uppercase')(value);
+	</script>
+
+You can also apply custom arguments, my adding them after the value: $filter('uppercase')(value, customArg1, customArg2)
+
+* The filter service is a filter function, creating service *
+
+In angular you can use a filter directly within html via a 'pipe', ex:
+	
+	{{ 'Hello' | uppercase}}
+
+* Does not need to be a string literal, could be a $scope.value *
+
+Can also apply custom arguments to html, ex: {{ 'Hello' | uppercase : arg1 : arg2 }}
+
+
+
+!!! In order to inject services into the controller, which also helps against minification, do this: !!!
+
+	<script>
+		Msgcontroller.$inject = ['$scope', '$filter', etc.....]
+	</script>
+
+
+
+Creating Custom Filters
+------------------------
+
+Step 1: Define Filter Factory Funciton
+---------------------------------------
+
+Factory - A factory is a central place in your code that produces new objects or functions.
+
+<script>
+	function CustomFilterFactory(){
+		return function (input){
+			//change input
+			return changedinput;
+		}
+	}
+</script>
+
+This function(factory) creates a filtering function. It takes in an argument and returns filtered output
+
+
+Step 2: Register Filter Factory with Module
+--------------------------------------------
+
+after our module instance, set up custom filter: 
+
+.filter('custom', CustomFilterFactory);
+
+
+Step 3: (Javascript) Inject it with 'name' + 'Filter'
+-----------------------------------------------------
+
+Ctrl.$inject = ['$scope', 'customFilter'];
+
+function Ctrl($scope, customFilter){
+	var msg = 'some input';
+	customFilter(msg);
+};
+
+Essentially, our custom filter name is 'custom', but in order to use it, we call 'customFilter'
+
+
+
+
+
+

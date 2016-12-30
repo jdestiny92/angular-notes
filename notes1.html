@@ -55,7 +55,7 @@ Dependency Injection = design pattern that implements 'inversion of control' for
 Besides $scope, you can inject $filter, for example:
 
 <script>
-function DIcontroller ($scope, filter){
+function DIcontroller ($scope, $filter){
 
 	var upCase = $filter('uppercase');
 	$scope.name = upCase($scope.name);
