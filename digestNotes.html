@@ -1,0 +1,140 @@
+Event Que: when a user clicks or presses a key, they go onto the event que.
+If you use regular on click method, the angular app doesn't recognize it, but if you use directives, such as
+ng-click or ng-keyup, then....those events are bound and dealt with via a premade handler via the angular context.
+
+The main handler which deals with events going from the event que to the angular context ($scope) is $digest
+
+The angular context has 'watchers' which wait and watch if everything happens to certain premade properties (props).
+
+The is seen very commonly, and you can even add additional properties to watch, for example:
+	
+	When you add a mustache {{variable}} or ng-model=""
+
+
+The digest goes through the watchers to make sure everything is unchanged.
+	If something has changed, it starts the process all over again via a loop until the change has been resolved and
+	there are no more changes.
+
+MOST of the time, this loop runs twice. Once to detect something has changed and another time to make sure nothing has changed.
+
+This iteration over the watchers is called the 'Digest Loop' the whole procedure is called the 'Digest Cycle'
+
+
+
+So why all the checking?
+
+	Well a change in the last property might have a caused a change in a previous property that wasn't recognized on the first
+	go around.
+
+This process is actually called 'Dirty Checking'
+
+
+
+Once the digest loop is complete, angular updates the DOM with whatever values have changed, repaints parts of the page,
+and you see the updated page in front of you.
+
+
+$$ is always indicative of something that is internal to angular js. This is seen if you console.log($scope)
+
+
+You can set up your own watch function:
+	
+	<script>
+		$scope.onceCounter = 1;
+
+		$scope.$watch('onceCounter', function(newValue, oldValue){
+
+		})
+	</script>
+
+The watch function takes in a property to watch then a function, the function also takes in two values
+
+If the property does not change, this function does not execute
+
+
+
+So it isn't really recomeneded crowding up your controller with these watch functions when you can set them up
+in your html file via {{}}, for example: {{ onceCounter }}
+
+
+
+
+Back to the event que, if you use non-angular functions, such as set timeout, it won't automatically activate the
+digest loop and values won't change automatcally on the page.
+
+For example:
+
+<script>
+	$scope.upCounter = function(){
+		setTimeout(function(){
+			$scope.counter++;
+		}, 2000)
+	}
+</script>
+
+However you can fix this by manually calling the digest cylce via $scope.digest()
+
+<script>
+	$scope.upCounter = function(){
+		setTimeout(function(){
+			$scope.counter++;
+			$scope.digest();
+		}, 2000)
+	}
+</script>
+
+
+A better way to do this would be to use the $apply function which catches errors/exceptions in Angular js.
+
+<script>
+	$scope.upCounter = function(){
+		setTimeout(function(){
+			$scope.$apply(function(){
+				$scope.counter++;
+			})
+		}, 2000)
+	}
+</script>
+
+
+An EVEN BETTER method would be adding the service $timeout which acts within angular via injecting it into the controller, ex:
+
+CounterController.$inject = ['$scope', '$timeout'];
+
+Then using it:
+
+<script>
+	$scope.upCounter = function(){
+		$timeout(function(){
+			$scope.counter++
+		}, 2000)
+	}
+</script>
+
+
+
+
+Different Binding Examples:
+
+2 Way
+-------
+
+<input type="text" ng-model="name">
+
+
+1 Way
+-------
+
+{{ lastname }}
+
+
+1 Time
+--------
+
+{{ ::fullname }}
+
+
+For 1 time data binding it initializes the property once then removes the watcher for that property from the digest cycle
+The purpose is for efficiency, via removing the total number of watchers in the cycle, improves speed and performance.
+This could be used for a user's username which may show upon login but won't need to change afterwards.
+
