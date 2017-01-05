@@ -1,0 +1,23 @@
+Use controllers to:
+	- set up initial state of $scope
+	- add behavior to the $scope (handle events that effect the view state)
+
+DO NOT use controllers to:
+	- handle business logic directly
+	- share code or state across other controllers
+
+
+Singleton Design Pattern
+-------------------------
+
+Restricts an object to always have a single instance.
+	- Each dependent component will get a reference to the same instance
+	- Multiple controllers injected with a Service will all have access to the same service instance
+	- This allows us to share data across different components (ie controllers) throughout application
+
+
+Lazily Instantiated
+--------------------
+
+The service is only created if an application component declares it as a dependency
+	- If no components in our application our dependent on this service, it will never get created
