@@ -21,3 +21,150 @@ Lazily Instantiated
 
 The service is only created if an application component declares it as a dependency
 	- If no components in our application our dependent on this service, it will never get created
+
+
+
+Factory Design Pattern
+----------------------
+
+Central place that produces new objects or functions
+	- Can produce any type of object, not just a Singleton
+	- Can be used to produce dynamically customizable services
+
+
+Factory vs Service Confusion
+-----------------------------
+
+.factory() is NOT just another way of creating the same service you can create with .service() but it CAN BE.
+
+.service() is also a factory, but much more limited one compared to .factory(). It's a factory that always produces
+the same type of service - a singleton, without an easy way to configure its behavior.
+
+
+How to instantiate? - Similar to service:
+
+.factory('CustomService', CustomService);
+
+1. You use 'CustomService' to inject into other services, controllers, etc...
+2. The CustomService variable or parameter is supposed to be a function that is expected to PRODUCE a service, not one that is already a service, as contrasted by the .service instantiation.
+
+
+2 Ways To Go About Making a Factory:
+
+1. <script>
+		function createFactory(){
+			var factory = {
+
+				getSomeService: function(){
+					return new someService();
+				}
+			};
+
+			return factory;
+		}
+</script>
+
+2. <script>
+		function createFactory(){
+			var factory = function(){
+
+				return new someService();
+			};
+
+			return factory;
+		}
+</script>
+
+In the end, you're either return a function or an object literal that has a key attached to a function as a value;
+
+1. <script>
+	var someSrv = CustomService.getSomeService();
+	someSrv.method();
+</script>
+
+2. <script>
+	var someSrv = CustomService();
+	someSrv.method();
+</script>
+
+
+
+.provider()
+--------------
+
+.provider() is the the most verbose, but most flexible among .service() and .factory()
+	- configure a factory not just at time of use, but at app bootstrapping
+
+.provider('name', function)
+	- whatever the 'name' is, thats what gets injected into other components
+
+.config() function gets called BEFORE any service, factory, or controller is instantiated
+	- therefore we can't inject any reguar components into .config
+	- we CAN inject the provider of service with the (name + 'Provider')
+
+Angular documentation states that .provider is actually gets called behind the scenes when we call .service or .factory
+
+
+STEP 1: DEFINE PROVIDER FUNCTION
+---------------------------------
+
+<script>
+	function ServiceProvider(){
+		var provider = this;
+		provider.config = {...};
+
+		provider.$get = function(){
+			var service = new Service(provider.config.prop);
+
+			return service;
+		};
+	}
+</script>
+
+
+STEP 2: REGISTER PROVIDER FUNCTION WITH MODULE
+-----------------------------------------------
+
+<script>
+	angular.module('app', [])
+	.controller('ctrl', Ctrl)
+	.provider('Service', ServiceProvider);
+
+	//Name of 'Service' will be injected, name of function does not matter
+</script>
+
+
+STEP 3: INJECT IT AS USUAL
+---------------------------
+
+<script>
+	Ctrl.$inject = ['$scope', 'Service'];
+
+	function Ctrl($scope, Service){
+		Service.someMethod();
+	}
+</script>
+
+
+STEP 4a (Optional): Register Config Function
+--------------------------------------------
+
+<script>
+	angular.module('app', [])
+	.controller('ctrl', Ctrl)
+	.provider('Service', ServiceProvider)
+	.config(Config);
+</script>
+
+
+Step 4b (Optional): Inject Provider into Config
+-------------------------------------------------
+
+<script>
+	Config.$inject = ['ServiceProvider'];
+	// This stems from 'Service' + name 'Provider'
+
+	function Config(ServiceProvider){
+		ServiceProvider.config.prop = 'value';
+	}
+</script>
