@@ -1,0 +1,34 @@
+What Is Inheritance?
+
+Its when an object or a class is based on another object or a class (parent), using the same implementation and/or the same values.
+
+Example:
+
+Have a class 'Animal' with parameter 'numberOfLegs' and a method walk()
+
+Now you can have a another class 'Dog' which inherits the properties from 'Animal'
+
+
+JS Prototypal Inheritance
+--------------------------
+
+The original object instance becomes the prototype for all subsequently created objects.
+
+
+Say you have a parent object called 'parent' with a type: 'parent' and a method().
+Now you create a child object from that parent called 'child' that will start off as an empty object. However, if we try to find the type of 'child' there obviously isn't one there initially. What javascript then does it look at the 'prototype chain', i.e., what is the parent of this object. Then it looks for the type property of the parent. There is, so the type property of child then becomes 'parent'. 
+
+Now you can manually change the type property of child by writing 
+child.type = 'child'; This essentially masks the type that is inheritted from the prototype!
+
+
+If you try to change to property of a child it masks the prototype property.
+
+However, if you try to change a property of an object of the child, it is forced to go up the prototype chain and the original object property in the parent is changed along with the child's.
+
+
+Scope Inheritence
+---------------------
+
+Scope inheritence follows the same logic as prototypal inheritance in Angular. For instance, say you have nested controllers for certain div tags. Properties of $scope are trickled down along said controllers.
+

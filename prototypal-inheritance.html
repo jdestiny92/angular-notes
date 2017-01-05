@@ -1,0 +1,60 @@
+What Is Inheritance? 
+--------------------
+
+Its when an object or a class is based on another object or a class (parent), using the same implementation and/or the same values. Example: Have a class 'Animal' with parameter 'numberOfLegs' and a method walk() Now you can have a another class 'Dog' which inherits the properties from 'Animal' 
+
+
+JS Prototypal Inheritance
+ -------------------------- 
+
+ The original object instance becomes the prototype for all subsequently created objects. Say you have a parent object called 'parent' with a type: 'parent' and a method(). Now you create a child object from that parent called 'child' that will start off as an empty object. However, if we try to find the type of 'child' there obviously isn't one there initially. What javascript then does it look at the 'prototype chain', i.e., what is the parent of this object. Then it looks for the type property of the parent. There is, so the type property of child then becomes 'parent'. Now you can manually change the type property of child by writing child.type = 'child'; This essentially masks the type that is inheritted from the prototype! If you try to change to property of a child it masks the prototype property. However, if you try to change a property of an object of the child, it is forced to go up the prototype chain and the original object property in the parent is changed along with the child's. 
+
+ Scope Inheritence 
+ --------------------- 
+ Scope inheritence follows the same logic as prototypal inheritance in Angular. For instance, say you have nested controllers for certain div tags. Properties of $scope are trickled down along said controllers.
+
+
+ Controller 'As' Syntax
+ -------------------------
+
+ ex: ng-controller="Controller1 as ctrl1"
+
+ the label or 'ctrl1' is attached to the corresponding scope service i.e., $scope.ctrl1, as a property
+
+ This object of the $scope points to object instance created by controller function constructor (Controller1)
+
+ Essentially the controller is added onto the $scope as a property, thus you don't need to inject or call $scope to begin with.
+
+ This allows you to access properties depending on the controller you are dealing with and also allows for much more readable code: 
+
+ {{ ctrl1.myProp }}
+
+ <script>
+ 	angular.module('...')
+ 	.controller('Controller1', Controller1);
+
+ 	function Controller1(){
+ 		this.myProp = 'some value';
+ 	}
+ </script>
+
+The other purpose to this is that you can have nested controllers and the scope's won't mask one another.
+So as long as your reference the proper controller, certain parameters or values work independently.
+
+
+Inheritence in general is used for code re-use (and sometimes to express a relationship between entitites)
+
+Prototypal Inheritence in JS is based on object instances rather than classes
+
+$scope is based on prototypal inheritence.
+	- child controller's $scope inherits from parent controller's $scope
+
+Controller As Syntax: 'ControllerName' + 'as' + 'label'
+
+Angular creates property 'label' on the $scope
+	- the label is a refernce to 'this', the instance of the Controller
+	- This works because .controller treats it as a function constructor
+
+Attach properties to 'this' inside of Controller, not $scope
+	- easier syntax in html and JS - no masking occurs
+
