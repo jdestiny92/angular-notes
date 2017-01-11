@@ -1,0 +1,42 @@
+Before Promises We Had Callbacks!
+
+<script>
+	asyncFunction(function(){
+		//do when asyncFunction is done
+	})
+</script>
+
+- The problem is: there is no easy and straightforward way to pass the results of asyncFunction back to its caller
+- Especially if the real recipient of the result is a few layers away (one service calling another service calling asyncFunction)
+- Call Back Hell !!! Imagine three nested asyncFunctions. You have to wait for all of them to complete to use ANY of the results
+- Very difficult to run these async functions in parrel or even deal with error handling
+
+
+Promise (Angular Js and New ES6 API)
+------------------------------------
+
+- Object which can be passed around or returned that holds references to the outcome of asynchronous behavior.
+- In Angular, promises are created through the $q service
+
+<script>
+	function asyncFunction(){
+		// Creates async environment with all the hooks into it, including the promise object
+		var deferred = $q.defer();
+
+		// Marks succesful completion, wraps data for the promise
+		if (...){
+			deferred.resolve(result);
+		};
+
+		// Marks unsuccesful completion, wraps data for the promise
+		else {
+			deferred.reject(error);
+		};
+
+		// Returns promise to caller (a hook back to this entire process)
+		return deferred.promise;
+	}
+</script>
+
+- Keep in mind the if and else statements can be done asynchronously.
+
