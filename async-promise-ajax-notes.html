@@ -40,3 +40,143 @@ Promise (Angular Js and New ES6 API)
 
 - Keep in mind the if and else statements can be done asynchronously.
 
+
+Next Step:
+
+<script>
+	var promise = asyncFunction();
+
+	promise.then(
+
+	function(result){
+		//do something with result
+	},
+
+	function(error){
+		//do something with error
+	});
+</script>
+
+- A promise is something that can be passed around throughout application
+- The 'then' function is also chainable because it itself also returns a promise
+
+
+The $q 'q service' has the ability to resolve multiple promises asynchronously so you don't need to wait for all to be finished:
+
+<script>
+	$q.all([promise1, promise2])
+
+	.then(function(result){
+		//do something with result
+	})
+
+	.catch(function(error){
+		//handle error
+	})
+</script>
+
+- This also allows a central place to handle all results and all errors from any of the promises!!! (execute in parallel)
+- HOWEVER, if any of the promises comes up with an error, all the promises won't activate and will jump to catch method
+- Remember: promises either get resolved or rejected
+- The then method takes two functions as arguments
+
+
+
+
+$http Service
+--------------
+
+<script>
+	$http({
+		method: 'GET',
+		url: 'http://someurl',
+		params: {param1: 'value1'}
+	})
+	.then(...);
+</script>
+
+- The $http service returns a promise, so you are able to return a then method
+- The url is the only required property
+- If not method is specified, GET is assumed
+- Params is used to encode certain parts into the url, ex: http://someurl?param1=value1
+
+<script>
+	$http({
+		url: 'http://someurl'
+	})
+	.then(
+		function success(response){
+			// do something with response.data
+		},
+		function error(response){
+			// do something with error response
+		});
+</script>
+
+- You can use a special function which gets invoked on the angular module to define constant variables: 
+
+<script>
+	angular.module('starter', [])
+	.constant('ApiBasePath', 'someurl');
+</script>
+
+- Then you need to inject it into any service you want to use it in
+
+
+
+
+
+Directives
+------------
+
+- In angular, compilation happens in the beginning when you load your html page or template
+- A directive is a marker on a DOM element that tells Angular's HTML compiler to attach a specified behavior to that DOM element
+- The compiler can even transform/change the DOM elements and its children
+- A marker can be an attribute, element name, comment, or CSS class
+
+
+How to create custom directive
+------------------------------
+
+Step 1: Register Directive
+
+<script>
+	angular.module('starter', [])
+	.directive('myTag', MyTag);
+</script>
+
+- 'myTag' = normalized name that will appear in HTML
+- 'MyTag' = factory function - returns DDO: Directive Definition Object
+
+
+Step 2: Define Factory Function
+
+<script>
+	MyTag.$inject = [...];
+	//Note you can inject other services into custom directives
+
+	function MyTag(...){
+		var ddo = {
+			template: 'Hello World!'
+			...
+		};
+
+		return ddo;
+	}
+</script>
+
+
+Step 3: Use in HTML
+
+<my-tag></my-tag>
+
+- Note that the name is NOT 'myTag' but 'my-tag'
+- it converts in from dash notation to camel case notation
+- remove '-', concatinate, capitalize second work, so it looks for 'myTag'
+
+
+* Unless specified otherwise, the scope of your directive will be the scope of the containing controller *
+
+
+- Instead of using a 'template' property, you can use 'templateUrl' and supply an html file name. Inside
+the file, you would put the code you want to display.
