@@ -156,6 +156,7 @@ Step 2: Define Factory Function
 	//Note you can inject other services into custom directives
 
 	function MyTag(...){
+		//ddo is the directive defintion object
 		var ddo = {
 			template: 'Hello World!'
 			...
@@ -180,3 +181,286 @@ Step 3: Use in HTML
 
 - Instead of using a 'template' property, you can use 'templateUrl' and supply an html file name. Inside
 the file, you would put the code you want to display.
+
+
+
+Restrict DDO Property
+----------------------
+
+<script>
+	function myDirective(){
+		var ddo = {
+			restrict: 'AE',
+			...
+		};
+
+		return ddo;
+	}
+</script>
+
+- The default restrict is 'AE', attribute/element, which means your directive could be either or
+- Restrict to 'A', attribute, if directive is extending behavior, such as ng-repeat
+- Restrict to 'E', element, if directive is defining a component with an associated template, such as <list-item>
+- The DDO's restrict property determines what Angular compiler should look for to detect your custom directive
+- Using directive as a different restrict type will cause the compiler to completely ignore it
+
+
+
+Isolate Scope
+--------------
+
+<script>
+	function myDirective(){
+		var ddo = {
+			scope: {},
+			...
+		};
+
+		return ddo;
+	}
+</script>
+
+- The open brackets '{}' signals isolate scope, e.g., Parent Scope is NOT inherited
+
+
+Bidirectional Property Binding:
+
+<script>
+	function myDirective(){
+		var ddo = {
+			scope: {
+				myProp: '=attributeName'
+			},
+			...
+		};
+
+		return ddo;
+	}
+</script>
+
+- 'myProp' is a local scope property
+- 'attributeName' is the HTML template attribute name
+- '=' signifies bidirectional binding, if you change the parent scope the child scope changes and vica versa
+- If you don't add the attribute name and just leave '=' angular assumes the attribute is named as the same as property name: 'my-prop'
+- If you use '=?' this signfies that the attribute is optional
+
+
+<my-directive my-prop="outerProp">
+</my-directive>
+
+- attributes follow the same camelCase normalization my-prop => myProp
+
+
+DOM Attribute Property Binding:
+
+<script>
+	function myDirective(){
+		var ddo = {
+			scope: {
+				myProp: '@myAttribute'
+			},
+			...
+		};
+
+		return ddo;
+	}
+</script>
+
+- '@myAttribute' binds myProp to the value of DOM attribute 'my-attribute'
+- the value assigned to 'myProp' is always a string
+
+<my-directive my-attribute="{{outerProp}}">
+</my-directive>
+
+- this set up behaves like 1 way binding
+- as the value of outerProp changes, so does the value of my-attribute and so does the value of myProp inside the directive
+
+Nothing stopping us from doing this:
+
+<my-directive 
+	my-attribute="Hi + {{outerProp + '!'}}">
+</my-directive>
+
+
+- Having isolate scope on the directive:	
+	- breaks the prototypal inheritence of the scope from the parent
+	- makes the directive more independent, less coupled with the controller
+- We pass values into the directive using scope bindings
+- Bidirectional binding ('=') is such that directive scope property change affects the bound property and vica versa
+- DOM attribute value binding ('@') always results in directive property being a string
+	- Changes to the DOM attribute value are propogated to the directive property, but not the other way around
+
+
+
+Using Controllers Inside Directives
+-----------------------------------
+
+Step 1: Declare Controller in Directive
+
+<script>
+		function myDirective(){
+		var ddo = {
+			scope: {
+				myProp: '='
+			},
+			controller: ControllerFunction,
+			bindToController: true,
+			controllerAs: 'myCtrl',
+			templateUrl: 'template.html'
+		};
+
+		return ddo;
+	}
+</script>
+
+- 'bindToController' = attach declared scope properties to controller instance instead of directly to $scope
+- 'controllerAs' = Use 'myCtrl' in directive's template to refer to controller instance
+
+
+Step 2: Define Controller
+
+<script>
+	ControllerFunction.$inject = ['Service'];
+
+	function ControllerFunction(Service){
+		var myCtrl = this;
+
+		myCtrl.method = function(){
+			var name = 'Hello ' + myCtrl.prop;
+			...
+		};
+	}
+</script>
+
+- 'myCtrl.prop' = Use (and manipulate) props in isolate scope
+
+
+Step 3: Use in Directive's Template:
+
+<div ng-if="myCtrl.method()">
+	{{myCtrl.prop}}
+</div>
+
+
+
+Bi-directional vs One-Way Binding:
+
+- it is best practice not to change the value of prop within a directive
+- thus, using bidirectional binding or '=' is a waste of resources ($watchers)
+- to use one way binding, use '<'
+	- one way binding watches only the identity of the parent property, not the property inside the directive
+
+- To add functionality to the directive, one choise is to use a controller that's declared directly on the DDO
+- Use controller property to declare controller in DDO
+- Use 'bindToController' and 'controllerAs' props to bind declared properties in isolate scope directly to controller instance
+- Define controller as usual
+- Whenever possible, use '<' for one-way binding to save resources instead of bidirectional binding with '='
+
+
+
+
+
+Directive APIs, Manipulating the DOM, and transclude
+------------------------------------------------------
+
+How to call a method on the parent scope from the child directive?
+
+
+Step 1: Define Method in Controller
+
+<script>
+	function Controller(){
+		this.method = function(arg1){
+			this.prop = 'Hi' + arg1;
+		};
+	}
+</script>
+
+- 'this' in both places refers to parent controller instance
+- 'arg1' needs to come from child directive
+
+
+
+Step 2: Declare Method Reference in Directive
+
+<script>
+	function MyDirective(){
+		var ddo = {
+			scope: {
+				myMethod: '&method'
+			},
+			...
+			templateUrl: 'template.html'
+		};
+
+		return ddo;
+	}
+</script>
+
+- 'myMethod' serves as property name to reference parent method in directive
+- '&method' is the attribute name to use in parent template on this directive
+
+
+
+Step 3: Declare in Parent's Template
+
+<div ng-controller="Controller as ctrl">
+	<my-directive method="ctrl.method(myArg)">
+	</my-directive>
+</div>
+
+- .method is a reference to method in controller
+- myArg is a placeholder label for value to be passed in from directive
+
+
+
+Step 4: Map Method and Args in Directive's Template
+-----------------------------------------------------
+
+<button
+	ng-click="dirCtrl.myMethod({myArg:'v1'});">
+	Remove Item
+</button>
+
+- .myMethod is the method name from isolate scope mapping
+- {myArg: 'v1'} = we're using the name of the argument that parent made the call with and mapping some value to it from our directive
+- So what we're passing to the method is a map object, not a simple argument 'myArg'
+
+
+controller's template.html
+----------------------------
+<div ng-controller="Controller as ctrl">
+	<my-directive method="ctrl.method(myArg)">
+	</my-directive>
+</div>
+
+VS.
+
+directive's template.html
+-------------------------
+<button
+	ng-click="dirCtrl.myMethod({myArg:'v1'});">
+	Remove Item
+</button>
+
+VS.
+
+DDO
+-----
+<script>
+	function MyDirective(){
+		var ddo = {
+			scope: {
+				myMethod: '&method'
+			},
+			...
+			templateUrl: 'template.html'
+		};
+
+		return ddo;
+	}
+</script>
+
+- method in controller template is in reference to '&method' in the DDO
+- if you want to use that method in the directive template, you have to use 'myMethod'
+- make sure to pass in data from directive to controller by passing in an object whose 'key' matches the same name as the controller's argument
