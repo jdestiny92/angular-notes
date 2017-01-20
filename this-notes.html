@@ -1,0 +1,26 @@
+<script>
+	function Person(){
+		this.fullName = 'Yaakov';
+		this.fav = 'Cookies';
+
+		this.describe = function(){
+			console.log(this);
+			console.log(this.fullName + ' likes' + this.fav);
+		};
+	}
+
+	//When you run this, 'this' points to the Person function
+	var yaakov = new Person();
+	yaakov.describe();
+
+	//However when you run this, 'this' points to the window
+	// Why? Because we took it out of its context, we are currently on the global scope
+	var describe = yaakov.describe;
+	describe();
+
+	//This is the javascript solution
+	//This allows you to pass in an object and the function will point its this back to yaakov
+	describe.call(yaakov);
+</script>
+
+

@@ -464,3 +464,144 @@ DDO
 - method in controller template is in reference to '&method' in the DDO
 - if you want to use that method in the directive template, you have to use 'myMethod'
 - make sure to pass in data from directive to controller by passing in an object whose 'key' matches the same name as the controller's argument
+
+
+- '&' binding allows us to execute an expression (such as a function value) in the context of the parent scope
+- Parent template must declare an attribute providing:
+	- Method reference to call on the parent
+	- Argument keys for directive to bind values to
+- Directive:
+	- Call the reference method
+	- Provides a map of argument key to value pairs
+	- Allows directive to pass data back to parent from isolate scope
+
+
+
+Manipulating the DOM via the Link Function
+-------------------------------------------
+
+- Even though you shouldn't manipulate the DOM directly, you should have angular do it for you, you still can depending on
+the situation
+- Angular has access to Jquerylite and even allows you to include full jquery if needed
+- Also, a better place to setup $watches is within the link function....
+
+
+Step 1: Declare Link Function
+
+<script>
+	function MyDirective(){
+		var ddo = {
+			scope: {...},
+			link: LinkFunction
+			...
+			templateUrl: 'template.html'
+		};
+
+		return ddo;
+	}
+</script>
+
+Step 2: Define the Link Function
+
+<script>
+	function LinkFunction(scope, element, attrs, controller){
+		...	
+	}
+
+	//Note this is not $scope, it is the scope passed from the directive
+	//Element represents the top level element of the directive
+	// It is a wrapper of the dom element, but if jquery is included, it is the reference to jquery itself
+	// attrs is a reference to the attributes declared on the element
+	// controller is the reference to the controller declared on this directive, if there is one
+</script>
+
+- to your link function you can also add a $watcher
+
+<script>
+	function LinkFunction(scope, element, attrs, controller){
+		scope.$watch('someFunction()', function(newValue, oldValue){
+			...
+
+			if(newValue===true){
+				displayCookieWarning();
+			}
+			else{
+				removeCookieWarning();
+			}
+		})
+
+		//If the function changes its value, the $watch function will fire
+		// reference functions need to be defined within overall LinkFunction
+
+		function displayCookieWarning(){
+			//Using Angular jqLite
+			var warningElem = element.find('div');
+			warningElem.css('display', 'block');
+		}
+
+		function removeCookieWarning(){
+			//Using Angular jqLite
+			var warningElem = element.find('div');
+			warningElem.css('display', 'none');
+		}
+	}
+</script>
+
+- DOM manipulation is usually done inside of the link function
+	- declared on the DDO
+- Link Function does not support injection
+	- to use injected components, services, or other controllers, inject them into the directive declartion
+- 'scope' parameter is the exact $scope in directive's controller
+- 'element' object represents the element of the directive
+	- top level element
+	- its jqLite object or jQuery object (if jQuery is included)
+
+
+
+Using Directive's Transclude to Wrap other Elements
+-----------------------------------------------------
+
+- essentially passing in template.html via ddo to work with arbitrary code that gains access to parent scope
+
+
+Step 1: Set transclude to true
+
+<script>
+	function MyDirective(){
+		var ddo = {
+			scope: {...},
+			transclude: true,
+			...
+			templateUrl: 'template.html'
+		};
+
+		return ddo;
+	}	
+</script>
+
+
+Step 2: Wrap Some Parent Content
+
+<my-directive>
+	<span>
+		Warning! Warning! {{ctrl.someProp}}
+	</span>
+</my-directive>
+
+- the expression is evaluated in the parent controller, not in our directive
+
+
+Step 3: ng-transclude To Place Wrapped Content
+
+<div>
+	<div ng-transclude></div>
+</div>
+
+- insert evaluated wrapped content into element marked with ng-transclude
+
+- transclude allows whole templates to be passed into the directive
+- the wrapped content is evaluated in the parent's context, NOT in the directive's context
+- In the DDO:
+	- transclude: true
+- In the directive's template:
+	- ng-transclue attribute designates place for evaluated wrapped content
