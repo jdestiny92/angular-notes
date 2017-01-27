@@ -1,0 +1,56 @@
+- Essentially, its difficult and messy to interact with multiple components on the DOM simultaneously
+- At this time, only real solution is using a service to communicate between them
+- However this is a design pattern that solves this:
+
+
+publish-suscribe design pattern
+--------------------------------
+
+Publishers send messages to subscribers on a common channel
+- Publishers:
+	- Mark messages with a classifcation
+	- Don't know subscribers or if there are any
+- Subscribers:
+	- Sign up to listen for messages with a particular classificaton
+	- Don't know publishers or if there are any
+- In Angular the common channel is scope
+	- Messages are events that can hold data
+
+
+Publishing an Event: $scope.$emit
+- emit sends a messages to every part up the scope until there is nothing left to send to
+
+Publishing an Event: $scope.$broadcast
+- broadcast sends a message to every part down the scope uniti there is nothing left to send to
+
+Listening for an Event: $scope.$on
+- ex: $scope.$on('greet', handlerFunction);
+
+Issue: What is you have two components that are neither descendents or ancestors?
+	- You can use $rootscope.$broadcast, to send the information down the rootscope: html(ng-app)
+
+Step 1: Brodcast or Emit an Event
+
+<script>
+	$scope.$broadcast('namespace:eventName', {prop:value});
+
+	//namespace is used for code readability
+</script>
+
+Step 2: Listen for & Handle the Event
+
+<script>
+	$scope.$on('namespace:eventName', handler);
+
+	function handler(event, data){
+		if(data.prop==='val1'){
+			...
+		}
+	};
+</script>
+
+- Publish-subscribe design pattern is implemented using the Angular Events system
+- You can publish events from anywhere in the system and listen for those events anywhere in the system
+- to listen for an event, either use $scope.$on or $rootScope.$on
+- MUST deregister the listener when using $rootScope.$on
+

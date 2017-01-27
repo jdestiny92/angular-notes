@@ -1,0 +1,179 @@
+3 Major Routing:
+
+Web 1.0 where every changed caused a hit to the server and had to refresh the page
+
+Web 2.0, ajax call, where some changes are handled by the browser and not the server, thus no refresh needed
+
+SPA = using #, on predefined states, which further lessens interaction with the server
+
+
+Two Major Routing Technologies:
+
+ngRoute
+----------
+
+- separate js file
+- developed by google and community
+- no concept of ui state
+- every route must be represented by a url
+- no concept of nested views
+- ok for prototype projects
+
+
+ui-router
+-----------
+
+- separate js file
+- developed by community
+- ui state is central
+	- can have a route with no unique URL for that route
+- URL routing is also supported
+	- ui state is updated based on the URL
+- nested views supported
+- better choice for more serious projects
+
+
+Step 1: Reference in HTML
+
+<script src="lib/angular.min.js"></script>
+<script src="lib/angular-ui-router.min.js"></script>
+
+
+Step 2: Place ui-view Initial View Placeholder
+
+<body>
+	...
+	<ui-view></ui-view>
+	...
+</body>
+
+
+Step 3: Declare ui-router As a Dependency
+
+angular.module('App',['ui.router']);
+
+
+Step 4: Configure Routes in .config Method
+
+<script>
+angular.module('App')
+.config(RoutesConfig);
+
+RoutesConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
+function RoutesConfig($stateProvider,$urlRouterProvider){
+	...
+
+	$urlRouterProvider
+		.otherwise('/view1');
+
+	$stateProvider
+		.state('view1', {
+			url: '/view1',
+			templateUrl: 'view1.html'
+		})
+
+		.state('view2', {...});
+	...
+
+}
+</script>
+
+- otherwise is used when a url is used that doesn't match any of the preset ones. This defaults to a view, usually 404 page
+
+IMPORTANT: you can class attribute: ui-sref on <a> tag or <button> tag to reference the state name and switch to that template
+
+- another important directive/attribute you can use is ui-sref-active="someCSSclass" which allows you to apply stying to said element if your on its corresponding state
+
+
+- ui-router uses independent concepts for URL mapping and UI state representation
+- use <ui-view> tag as placeholder for state-based UI
+
+- you can declare controller directly in definition of the state, also you can use controller as syntax
+
+
+
+State Resolve Property
+------------------------
+
+Step 1: Set Up Resolve Property
+
+<script>
+	.state('view1', {
+			url: '/view1',
+			templateUrl: 'view1.html',
+			controller: 'view1Ctrl as view1',
+			resolve: {
+				myData: ['Service', function(Service){
+					return Service.getData();
+				}]
+			}
+		});
+</script>
+
+- angular will inject the service 'Service' into said function
+- Service.getData() returns a promise
+- the resolution of everything is that the returned value will be injected into View1Ctrl as 'myData'
+
+
+Step 2: Inject Resolve Property Into Controller
+
+<script>
+	View1Ctrl.$inject = ['myData'];
+	function View1Ctrl(myData){
+		var view1 = this;
+		view1.myData = myData;
+	}
+</script>
+
+- resolve properties DO NOT have to be promies, they could be a string or anything that we would want to inject into controller
+
+- resolve property can be used to inject values directly into the controller responsible for the state
+
+- if resolve property is a promise:
+	- router will wait for it to resolve before transitioning to the state
+	- if rejected, router will not transition to the new state at all
+- the name of the key in the resolve's property object is what is to be injected into the corresponding controller's function
+- resolve can have properties that contain anything: objects, strings, etc.
+
+
+
+Using ui-router to map url parameters
+----------------------------------------
+
+State 1: Set up URL Property With Param(s)
+
+<script>
+	.state('view1', {
+		url: '/view1/{param1}',
+		templateUrl: 'view1.html',
+		controller: 'View1Ctrl as view1',
+		resolve: {
+			myData: ['$stateParams', function($stateParams){
+				return getDataBasedOn($stateParams.param1);
+			}]
+		}
+	});
+</script>
+
+Step 2: Inject Resolve Property Into Controller
+
+<script>
+	View1Ctrl.$inject = ['myData'];
+	function View1Ctrl(myData){
+		var view1 = this;
+		view1.myData = myData;
+	}
+</script>
+
+If you want a ui-sref to transition to a state that expects parameters:
+
+<a ui-sref="view1({itemId:someVal1})">Link to the view data</a>
+
+- the name, 'itemId', must match the expected paramater exactly
+
+
+- use $stateParams service to retrieve parameters
+	- $stateParams.paramName
+
+- Construct a URL with ui-sref directive:
+	- ui-sref="stateName({paramName:value})"

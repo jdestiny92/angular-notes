@@ -1,0 +1,53 @@
+Step 1: Declare/Creat Module
+
+angular.module('module1', []);
+
+- You can declare no dependencies or other modules as dependencies
+
+angular.module('module3', ['module1', 'module2']);
+
+
+Step 2: Declar Module Artifacts
+
+angular.module('module1')
+.controller('MyController', MyController);
+
+- Note that the second argument in angular.module is ommited, this means that it was alrady created, otherwise cause error
+
+Step 3: ng-app="MainModule"
+
+<html ng-app="MainModule"></html>
+
+
+- It is a best practice to seperate Javascript into seperate files
+- It doesn't matter in what order you link your javascript files, the compiler/browser reads them all then figures out what
+	depends on what
+- HOWEVER, you can't link to a controller that depends on a module if you haven't loaded that module first
+
+
+Config and Run Blocks
+
+<script>
+	angular.module('module1')
+	.config(function(){
+		...
+	})
+</script>
+
+- config runs before any other methods on the module
+- parameters that can be injected can only be providers or constants
+
+<script>
+	angular.module('module1')
+	.run(function(){
+		...
+	})
+</script>
+
+- the run method is executed right after the config method
+- you can only inject instances (ex: services) and constants
+
+
+- IMPORTANT: separting files is easy. declares modules first, just the instance, then reference all other files that reference it
+	- make sure to check which modules depend on one another
+
