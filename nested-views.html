@@ -1,0 +1,98 @@
+Routing State with Nested Views
+----------------------------------------------
+
+Setting up Child (nested) State
+
+<script >
+	.state('view1.child', {
+		url: '/detail/{param}',
+		templateUrl: 'view1Detail.html'
+	})
+</script>
+
+- this url gets concatinated with parent url
+
+
+Inherited resolve Properties
+
+parent state:
+<script >
+	.state('view1', {
+		resolve: {
+			myData: 'someVal';
+		}
+	})
+</script>
+
+child state:
+<script>
+	.state('view1.child', {
+		controller: "ChildCtrl as child"
+	})
+</script>
+
+- this allows you to inject 'mydata' into the controller so you do less server side calls, aka reusing same info
+
+- you don't need to call it .'child' you can call it anything
+
+Important: $stateParams is used to look up the item id in the url
+
+- so you need to put another <ui-view> where you would want the child template to be
+
+- instead of declaring a url paramter within the child state, you can delcare a params parameter: 
+
+params {
+	itemId: null
+}
+
+- nested states allow us to to logically represent nested views
+- parent state template has a ui-view in its template for the child state's template to insert its HTML
+- Child state name is usually declared with syntax 'parent.child'
+- The optionally declared url of the child gets concatenated to the declared url of the parent
+
+Important: the parent's resolve property is inherited by the child and is injectable directly into the child's controller
+
+
+Router State Transition Events
+--------------------------------------------
+
+$stateChangeStart
+- fires when state change transition begins
+
+<script>
+	$rootScope.$on('stateChangeStart', function(event, toState, toParams, fromState, fromParams, options){
+		...
+	})
+</script>
+
+- use this to fire off a spinner if you're waiting for code to work out
+
+
+$stateChangeSuccess
+- fired once the state transition is complete
+
+<script>
+	$rootScope.$on('stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+		...
+	})
+</script>
+
+- notice the missing params at the end compared to last example
+
+$stateChangeError
+- fires when an error occurs during transition
+
+<script>
+	$rootScope.$on('stateChangeSuccess', function(event, toState, toParams, fromState, fromParams, error){
+		...
+	})
+</script>
+
+- notice the difference in the last parameter
+
+- say you caught an error, in won't so up on console, thats why you use this
+
+- you can use event.preventDefault() to prevent transition from occuring, referencing to stateChangeStart
+
+- ui-router exposes numerous state change events that our code is able to listen for
+- All ui-router events are fired on the $rootScope
