@@ -1,0 +1,54 @@
+Step 1: Create a form in HTML with name attributes
+
+<form name="formName">
+	<input type="text" name="name">
+	<button>Submit</button>
+</form>
+
+- add name attributes
+
+
+Step 2: Bind Input with Ng-Model
+
+<form>
+	<input type="text" name="name" ng-model="ctrl.name">
+	<button ng-click="ctrl.go()">Submit</button>
+</form>
+
+
+Step 3: Declare HTML 5 Validation Attributes
+
+<form name="formName" novalidate>
+	<input type="text" name="name" ng-model="ctrl.name" required min-length="4">
+	<button ng-click="ctrl.go()">Submit</button>
+</form>
+
+- novalidate stops regular html validation and instead is using on click of submit
+
+
+Step 4: Use Angular Form Bound Objects
+
+<input type="text" name="name" ng-model="ctrl.name" required min-length="4">
+<span ng-if="formName.name.$error.required && formName.name.$touched">Name is required</span>
+
+- So the reason you can select via the name attributes is because when angular compiles the html,
+it reads through the form element and makes a special controller just for it which gets assigned to $scope
+- the name is uses is the name the form attribute specifies
+- then it creates a bunch of objects whose names match the names on each input field
+
+<button ng-disabled="formName.$invalid" ng-click="ctrl.go()">Submit</button>
+
+- $invalid is true if there are any validation erros, thus you can only use submit button if $invalid is false
+
+
+Step 5: Use Angular Validation Styles
+
+.ng-touched.ng-valid {
+	border: 2px solid green;
+}
+
+.ng-touched.ng-invalid {
+	border: 2px solid red;
+}
+
+

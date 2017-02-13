@@ -1,0 +1,54 @@
+unit testing
+------------------
+
+- independent checking for proper operation of the smallest testable part of an application
+- independent: isolated from the rest of the system
+- smallest testable: means you have to approach all of code development from this perspective
+	- i.e., won't work if you have one function that does everything
+- should be repeatable
+
+
+mocking
+--------------
+
+- technique where dependency and its behavior is imitated (or faked)
+- can be done directly by developer or via mocking library
+
+
+Jasmine
+--------------
+
+Steps for Jasmine-based (browser) Tests
+
+- download and unzip Jasmin standalone into a directory
+- erase everything in src and spec directories
+- place your application code into the src directory
+- place your test code or a spec into the spec directory
+- update SpecRunner.html
+	- replace references to erased src and spec files with your own
+- start browser-sync or whatever you use for local server and go to http://..//SpecRunner.html to run specs
+
+
+Writing a Spec (test)
+
+<script>
+	describe('My Function', function(){
+		var initValue;
+
+		// this is optional, this logic is run once before each spec is run
+		beforeEach(function(){
+			initValue = 'someVal';
+		});
+
+		it('should not return true', function(){
+			var result = someFunction(initValue);
+
+			expect(result).not.toBe(true);
+		});
+	});
+</script>
+
+- mocks are used to fake the dependencies of target code
+- describe is used to group tests together
+- beforeEach is used to initialize state before running each test
+- it is used to run the actual test code

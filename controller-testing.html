@@ -1,0 +1,14 @@
+beforeEach Setup
+
+<script>
+	describe('tests', function(){
+		beforeEach(function(){
+			module('myApp');
+
+			setupMock();
+
+			// you pass in the module you're working from, also lets you do multiple things at once
+			// for 'beforeEach', i.e, setup module and setup mock object
+		})
+	})
+</script>
